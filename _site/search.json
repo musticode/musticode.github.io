@@ -1,13 +1,25 @@
 [
   
     {
+      "title"    : "Redis with SpringBoot",
+      "title-lower"    : "redis with springboot",
+      "sub-titile" : "",
+      "sub-titile-lower" : "",
+      "categories" : "SpringBootJavaRedis",
+      "tags"     : "",
+      "url"      : "/springboot/java/redis/2024/06/19/redis-integration.html",
+      "date"     : "2024-06-19 18:33:36 +0300",
+      "content"     : "Redis with Spring Bootdocker-compose.yml fileservices:    redis:    image: redis:latest    restart: always    ports:      - &quot;6379:6379&quot;    environment:      - REDIS_PASSWORD=my-password  ..."
+    } ,
+  
+    {
       "title"    : "Kafka Integration with SpringBoot",
       "title-lower"    : "kafka integration with springboot",
       "sub-titile" : "",
       "sub-titile-lower" : "",
-      "categories" : "JavascriptNodeJS",
+      "categories" : "SpringBootJavaKafka",
       "tags"     : "",
-      "url"      : "/javascript/nodejs/2024/06/10/test-musti.html",
+      "url"      : "/springboot/java/kafka/2024/06/10/test-musti.html",
       "date"     : "2024-06-10 18:33:36 +0300",
       "content"     : "Kafka Integration with SpringBootKafka docker-compose file  kafka  zookeeper  kafka uiversion: &#39;2&#39;services:  zookeeper:    image: confluentinc/cp-zookeeper:latest    environment:      ZOOKE..."
     } ,

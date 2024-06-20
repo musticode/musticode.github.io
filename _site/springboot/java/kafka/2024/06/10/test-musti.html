@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:300|Raleway:400,700" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/style.css">
+<title>Kafka Integration with SpringBoot</title>
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Kafka Integration with SpringBoot | Mustafa Karatas</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="Kafka Integration with SpringBoot" />
+<meta name="author" content="musticode" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Kafka Integration with SpringBoot" />
+<meta property="og:description" content="Kafka Integration with SpringBoot" />
+<link rel="canonical" href="http://localhost:4000/springboot/java/kafka/2024/06/10/test-musti.html" />
+<meta property="og:url" content="http://localhost:4000/springboot/java/kafka/2024/06/10/test-musti.html" />
+<meta property="og:site_name" content="Mustafa Karatas" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-06-10T18:33:36+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Kafka Integration with SpringBoot" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"musticode"},"dateModified":"2024-06-10T18:33:36+03:00","datePublished":"2024-06-10T18:33:36+03:00","description":"Kafka Integration with SpringBoot","headline":"Kafka Integration with SpringBoot","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/springboot/java/kafka/2024/06/10/test-musti.html"},"url":"http://localhost:4000/springboot/java/kafka/2024/06/10/test-musti.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+<script type="text/javascript" src="/assets/js/darkmode.js"></script>
+
+</head><body>
+  <main class="container">
+    <section class="about">
+      <div class="about-header condensed">
+      <div class="about-title">
+      <a href="/">
+        
+        <img src="/assets/mustidavul-photoaidcom-cropped.png" alt="Mustafa Karataş" />
+        
+      </a>
+      <h2 id="title">
+        <a href="/">Mustafa Karataş</a>
+      </h2>
+      </div><p class="tagline">Software Engineer</p></div>
+      
+      <ul class="social about-footer condensed"><a href="https://github.com/musticode" target="_blank">
+          <li>
+            <i class="icon-github-circled"></i>
+          </li>
+        </a></ul><p class="about-footer condensed">&copy;
+        2024</p><div class="about-footer condensed">
+        <p>Dark Mode
+          <i class="icon-moon"></i>
+          <label class="switch">
+            <input type="checkbox" class="dark-mode-toggle">
+            <span class="slider round" onclick="toggleDarkMode()"></span>
+          </label>
+        </p>
+      </div>
+    </section>
+    <section class="content">
+      <div class="post-container">
+  <a class="post-link" href="/springboot/java/kafka/2024/06/10/test-musti.html">
+    <h2 class="post-title">Kafka Integration with SpringBoot</h2>
+  </a>
+  <div class="post-meta">
+    <div class="post-date"><i class="icon-calendar"></i>Jun 10, 2024</div><ul class="post-categories"><li>SpringBoot</li><li>Java</li><li>Kafka</li></ul></div>
+  <div class="post">
+    <p>Kafka Integration with SpringBoot</p>
+
+<h2 id="kafka-docker-compose-file">Kafka docker-compose file</h2>
+
+<ul>
+  <li>kafka</li>
+  <li>zookeeper</li>
+  <li>kafka ui</li>
+</ul>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">2'</span>
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">zookeeper</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">confluentinc/cp-zookeeper:latest</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="na">ZOOKEEPER_CLIENT_PORT</span><span class="pi">:</span> <span class="m">2181</span>
+      <span class="na">ZOOKEEPER_TICK_TIME</span><span class="pi">:</span> <span class="m">2000</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">52181:2181</span>
+
+  <span class="na">kafka</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">confluentinc/cp-kafka:7.0.1</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">9092:9092"</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">zookeeper</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="na">KAFKA_BROKER_ID</span><span class="pi">:</span> <span class="m">1</span>
+      <span class="na">KAFKA_ZOOKEEPER_CONNECT</span><span class="pi">:</span> <span class="s1">'</span><span class="s">zookeeper:2181'</span>
+      <span class="na">KAFKA_LISTENER_SECURITY_PROTOCOL_MAP</span><span class="pi">:</span> <span class="s">PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT</span>
+      <span class="na">KAFKA_ADVERTISED_LISTENERS</span><span class="pi">:</span> <span class="s">PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092</span>
+      <span class="na">KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR</span><span class="pi">:</span> <span class="m">1</span>
+      <span class="na">KAFKA_TRANSACTION_STATE_LOG_MIN_ISR</span><span class="pi">:</span> <span class="m">1</span>
+      <span class="na">KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR</span><span class="pi">:</span> <span class="m">1</span>
+
+  <span class="na">kafka-admin</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">provectuslabs/kafka-ui</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">kafka-admin</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">9091:8080"</span>
+    <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">kafka</span>
+      <span class="pi">-</span> <span class="s">zookeeper</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">KAFKA_CLUSTERS_0_NAME=local</span>
+      <span class="pi">-</span> <span class="s">KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092</span>
+      <span class="pi">-</span> <span class="s">KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181</span>
+</code></pre></div></div>
+
+<p><strong>pom.xml</strong><br /></p>
+
+<p>dependencies</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.kafka<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-kafka<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.kafka<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-kafka-test<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<h3 id="producer-application">Producer Application</h3>
+
+<p><strong>application.properties</strong></p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">spring.kafka.topic.name</span><span class="p">=</span><span class="s">order_topics</span>
+
+<span class="py">spring.kafka.consumer.bootstrap-servers</span><span class="p">=</span><span class="s">localhost:9092</span>
+<span class="py">spring.kafka.consumer.group-id</span><span class="p">=</span><span class="s">stock</span>
+<span class="py">spring.kafka.consumer.auto-offset-reset</span><span class="p">=</span><span class="s">earliest</span>
+<span class="py">spring.kafka.consumer.key-deserializer</span><span class="p">=</span><span class="s">org.apache.kafka.common.serialization.StringDeserializer</span>
+<span class="py">spring.kafka.consumer.value-deserializer</span><span class="p">=</span><span class="s">org.springframework.kafka.support.serializer.JsonDeserializer</span>
+<span class="py">spring.kafka.consumer.properties.spring.json.trusted.packages</span><span class="p">=</span><span class="s">*</span>
+
+<span class="py">spring.kafka.producer.bootstrap-servers</span><span class="p">=</span><span class="s">localhost:9092</span>
+<span class="py">spring.kafka.producer.key-serializer</span><span class="p">=</span><span class="s">org.apache.kafka.common.serialization.StringSerializer</span>
+<span class="py">spring.kafka.producer.value-serializer</span><span class="p">=</span><span class="s">org.springframework.kafka.support.serializer.JsonSerializer</span>
+
+</code></pre></div></div>
+
+<p><strong>KafkaTopicConfig.class</strong></p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Configuration</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">KafkaTopicConfig</span> <span class="o">{</span>
+
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">"${spring.kafka.topic.name}"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">topicName</span><span class="o">;</span>
+
+    <span class="nd">@Bean</span>
+    <span class="kd">public</span> <span class="nc">NewTopic</span> <span class="nf">topic</span><span class="o">(){</span>
+        <span class="k">return</span> <span class="nc">TopicBuilder</span><span class="o">.</span><span class="na">name</span><span class="o">(</span><span class="n">topicName</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>There should be a OrderEvent class to send message as an object</p>
+</blockquote>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrderEvent</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">message</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">status</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Order</span> <span class="n">order</span><span class="o">;</span>
+    <span class="c1">//constructor</span>
+    <span class="c1">//setters and getters</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><strong>OrderProducer.class</strong> <br /></p>
+
+<p>We should pass OrderEvent object to sendMessage method, event is set as payload<code class="language-plaintext highlighter-rouge">.withPayload(event)</code>.<br />
+topic name is set as header <code class="language-plaintext highlighter-rouge">.setHeader(KafkaHeaders.TOPIC, topic.name())</code></p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Service</span>
+<span class="nd">@Slf4j</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrderProducer</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">NewTopic</span> <span class="n">topic</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">KafkaTemplate</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">OrderEvent</span><span class="o">&gt;</span> <span class="n">kafkaTemplate</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nf">OrderProducer</span><span class="o">(</span><span class="nc">NewTopic</span> <span class="n">topic</span><span class="o">,</span> <span class="nc">KafkaTemplate</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">OrderEvent</span><span class="o">&gt;</span> <span class="n">kafkaTemplate</span><span class="o">){</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">topic</span> <span class="o">=</span> <span class="n">topic</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">kafkaTemplate</span> <span class="o">=</span> <span class="n">kafkaTemplate</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">sendMessage</span><span class="o">(</span><span class="nc">OrderEvent</span> <span class="n">event</span><span class="o">){</span>
+        <span class="c1">// create message</span>
+        <span class="nc">Message</span><span class="o">&lt;</span><span class="nc">OrderEvent</span><span class="o">&gt;</span> <span class="n">message</span> <span class="o">=</span> <span class="nc">MessageBuilder</span>
+                <span class="o">.</span><span class="na">withPayload</span><span class="o">(</span><span class="n">event</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">setHeader</span><span class="o">(</span><span class="nc">KafkaHeaders</span><span class="o">.</span><span class="na">TOPIC</span><span class="o">,</span> <span class="n">topic</span><span class="o">.</span><span class="na">name</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+
+        <span class="n">kafkaTemplate</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">message</span><span class="o">);</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><strong>OrderService.class</strong> <br /></p>
+
+<p>OrderProducer is autowired to OrderService.class to send message</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Service</span>
+<span class="nd">@RequiredArgsConstructor</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrderService</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">OrderProducer</span> <span class="n">orderProducer</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">placeOrder</span><span class="o">(</span><span class="nc">Order</span> <span class="n">order</span><span class="o">){</span>
+
+        <span class="n">order</span><span class="o">.</span><span class="na">setOrderId</span><span class="o">(</span><span class="no">UUID</span><span class="o">.</span><span class="na">randomUUID</span><span class="o">().</span><span class="na">toString</span><span class="o">());</span>
+
+        <span class="nc">OrderEvent</span> <span class="n">orderEvent</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">OrderEvent</span><span class="o">();</span>
+        <span class="n">orderEvent</span><span class="o">.</span><span class="na">setStatus</span><span class="o">(</span><span class="s">"PENDING"</span><span class="o">);</span>
+        <span class="n">orderEvent</span><span class="o">.</span><span class="na">setMessage</span><span class="o">(</span><span class="s">"Order is pending state"</span><span class="o">);</span>
+        <span class="n">orderEvent</span><span class="o">.</span><span class="na">setOrder</span><span class="o">(</span><span class="n">order</span><span class="o">);</span>
+
+        <span class="n">orderProducer</span><span class="o">.</span><span class="na">sendMessage</span><span class="o">(</span><span class="n">orderEvent</span><span class="o">);</span>
+
+        <span class="k">return</span> <span class="s">"Order placed..."</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="consumer-application">Consumer Application</h3>
+
+<p>consumer properties can be just deserializer, but I want to give deserializer and serializers</p>
+
+<p><strong>application.properties</strong></p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">spring.kafka.topic.name</span><span class="p">=</span><span class="s">order_topics</span>
+
+<span class="py">spring.kafka.consumer.bootstrap-servers</span><span class="p">=</span><span class="s">localhost:9092</span>
+<span class="py">spring.kafka.consumer.group-id</span><span class="p">=</span><span class="s">stock</span>
+<span class="py">spring.kafka.consumer.auto-offset-reset</span><span class="p">=</span><span class="s">earliest</span>
+<span class="py">spring.kafka.consumer.key-deserializer</span><span class="p">=</span><span class="s">org.apache.kafka.common.serialization.StringDeserializer</span>
+<span class="py">spring.kafka.consumer.value-deserializer</span><span class="p">=</span><span class="s">org.springframework.kafka.support.serializer.JsonDeserializer</span>
+<span class="py">spring.kafka.consumer.properties.spring.json.trusted.packages</span><span class="p">=</span><span class="s">*</span>
+
+<span class="py">spring.kafka.producer.bootstrap-servers</span><span class="p">=</span><span class="s">localhost:9092</span>
+<span class="py">spring.kafka.producer.key-serializer</span><span class="p">=</span><span class="s">org.apache.kafka.common.serialization.StringSerializer</span>
+<span class="py">spring.kafka.producer.value-serializer</span><span class="p">=</span><span class="s">org.springframework.kafka.support.serializer.JsonSerializer</span>
+
+</code></pre></div></div>
+
+<p><strong>OrderConsumer.class</strong></p>
+
+<p>OrderConsumer is a service, <code class="language-plaintext highlighter-rouge">@KafkaListener</code> annotation should be used for consume method. OrderEvent should be passed to consume method.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Service</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrderConsumer</span> <span class="o">{</span>
+
+
+    <span class="nd">@KafkaListener</span><span class="o">(</span>
+            <span class="n">topics</span> <span class="o">=</span> <span class="s">"${spring.kafka.topic.name}"</span><span class="o">,</span>
+            <span class="n">groupId</span> <span class="o">=</span> <span class="s">"${spring.kafka.consumer.group-id}"</span>
+    <span class="o">)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">consume</span><span class="o">(</span><span class="nc">OrderEvent</span> <span class="n">orderEvent</span><span class="o">){</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">orderEvent</span><span class="o">.</span><span class="na">getOrder</span><span class="o">().</span><span class="na">getOrderId</span><span class="o">());</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">orderEvent</span><span class="o">.</span><span class="na">getOrder</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">orderEvent</span><span class="o">.</span><span class="na">getOrder</span><span class="o">().</span><span class="na">getQty</span><span class="o">());</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+  </div></div>
+
+    </section>
+    <footer class="condensed">
+      <ul class="social about-footer condensed"><a href="https://github.com/musticode" target="_blank">
+          <li>
+            <i class="icon-github-circled"></i>
+          </li>
+        </a></ul><p class="about-footer condensed">&copy;
+        2024</p><div class="about-footer condensed">
+        <p>Dark Mode
+          <i class="icon-moon"></i>
+          <label class="switch">
+            <input type="checkbox" class="dark-mode-toggle">
+            <span class="slider round" onclick="toggleDarkMode()"></span>
+          </label>
+        </p>
+      </div>
+    </footer>
+  </main>
+  
+  <script type="text/javascript" src="/assets/js/darkmode.js"></script>
+  
+  <script src="/assets/js/simple-jekyll-search.min.js"></script>
+  <script src="/assets/js/search.js"></script>
+  
+</body>
+
+</html>
