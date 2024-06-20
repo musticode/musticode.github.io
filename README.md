@@ -1,3 +1,9 @@
+# Local development :
+- https://medium.com/software-development-turkey/github-pages-ve-jekyll-ile-ki%C5%9Fisel-blog-olu%C5%9Fturmak-21269beb2062
+
+To install -> `bundle install`
+To run -> `bundle exec jekyll serve`
+
 # plainwhite
 
 Simplistic jekyll portfolio-style theme for writers.
