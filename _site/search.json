@@ -13,6 +13,18 @@
     } ,
   
     {
+      "title"    : "CDC Debezium integration with SpringBoot",
+      "title-lower"    : "cdc debezium integration with springboot",
+      "sub-titile" : "",
+      "sub-titile-lower" : "",
+      "categories" : "SpringBootJavaKafka",
+      "tags"     : "",
+      "url"      : "/springboot/java/kafka/2024/06/19/change-data-capture.html",
+      "date"     : "2024-06-19 17:33:36 +0300",
+      "content"     : "CDC Debezium integration with SpringBootCDCChange Data Capture (CDC) is a technique and a design pattern. We often use it to replicate data between databases in real-time. We can also track data ch..."
+    } ,
+  
+    {
       "title"    : "Kafka Integration with SpringBoot",
       "title-lower"    : "kafka integration with springboot",
       "sub-titile" : "",

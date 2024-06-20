@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:300|Raleway:400,700" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/style.css">
+<title>CDC Debezium integration with SpringBoot</title>
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>CDC Debezium integration with SpringBoot | Mustafa Karatas</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="CDC Debezium integration with SpringBoot" />
+<meta name="author" content="musticode" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CDC Debezium integration with SpringBoot" />
+<meta property="og:description" content="CDC Debezium integration with SpringBoot" />
+<link rel="canonical" href="http://localhost:4000/springboot/java/kafka/2024/06/19/change-data-capture.html" />
+<meta property="og:url" content="http://localhost:4000/springboot/java/kafka/2024/06/19/change-data-capture.html" />
+<meta property="og:site_name" content="Mustafa Karatas" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-06-19T17:33:36+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="CDC Debezium integration with SpringBoot" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"musticode"},"dateModified":"2024-06-19T17:33:36+03:00","datePublished":"2024-06-19T17:33:36+03:00","description":"CDC Debezium integration with SpringBoot","headline":"CDC Debezium integration with SpringBoot","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/springboot/java/kafka/2024/06/19/change-data-capture.html"},"url":"http://localhost:4000/springboot/java/kafka/2024/06/19/change-data-capture.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+<script type="text/javascript" src="/assets/js/darkmode.js"></script>
+
+</head><body>
+  <main class="container">
+    <section class="about">
+      <div class="about-header condensed">
+      <div class="about-title">
+      <a href="/">
+        
+        <img src="/assets/mustidavul-photoaidcom-cropped.png" alt="Mustafa Karataş" />
+        
+      </a>
+      <h2 id="title">
+        <a href="/">Mustafa Karataş</a>
+      </h2>
+      </div><p class="tagline">Software Engineer</p></div>
+      
+      <ul class="social about-footer condensed"><a href="https://github.com/musticode" target="_blank">
+          <li>
+            <i class="icon-github-circled"></i>
+          </li>
+        </a></ul><p class="about-footer condensed">&copy;
+        2024</p><div class="about-footer condensed">
+        <p>Dark Mode
+          <i class="icon-moon"></i>
+          <label class="switch">
+            <input type="checkbox" class="dark-mode-toggle">
+            <span class="slider round" onclick="toggleDarkMode()"></span>
+          </label>
+        </p>
+      </div>
+    </section>
+    <section class="content">
+      <div class="post-container">
+  <a class="post-link" href="/springboot/java/kafka/2024/06/19/change-data-capture.html">
+    <h2 class="post-title">CDC Debezium integration with SpringBoot</h2>
+  </a>
+  <div class="post-meta">
+    <div class="post-date"><i class="icon-calendar"></i>Jun 19, 2024</div><ul class="post-categories"><li>SpringBoot</li><li>Java</li><li>Kafka</li></ul></div>
+  <div class="post">
+    <p>CDC Debezium integration with SpringBoot</p>
+
+<h3 id="cdc">CDC</h3>
+<p>Change Data Capture (CDC) is a technique and a design pattern. We often use it to replicate data between databases in real-time. <br /></p>
+
+<p>We can also track data changes written to a source database and automatically sync target databases. CDC enables incremental loading and eliminates the need for bulk load updating.</p>
+
+<h3 id="debezium">Debezium</h3>
+<p>Based on Apache Kafka, Debezium is an open-source platform for CDC. Its main purpose is to create a transaction log that contains all row-level modifications committed to each source database table. Based on incremental changes in the data, any application that is listening to these events can take the necessary steps.</p>
+
+<h3 id="project-overview">Project overview</h3>
+
+<p>docker-compose.yml</p>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">2'</span>
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">zookeeper</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">confluentinc/cp-zookeeper:latest</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="na">ZOOKEEPER_CLIENT_PORT</span><span class="pi">:</span> <span class="m">2181</span>
+      <span class="na">ZOOKEEPER_TICK_TIME</span><span class="pi">:</span> <span class="m">2000</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">52181:2181</span>
+
+  <span class="na">kafka</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">confluentinc/cp-kafka:7.0.1</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">9092:9092"</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">zookeeper</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="na">KAFKA_BROKER_ID</span><span class="pi">:</span> <span class="m">1</span>
+      <span class="na">KAFKA_ZOOKEEPER_CONNECT</span><span class="pi">:</span> <span class="s1">'</span><span class="s">zookeeper:2181'</span>
+      <span class="na">KAFKA_LISTENER_SECURITY_PROTOCOL_MAP</span><span class="pi">:</span> <span class="s">PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT</span>
+      <span class="na">KAFKA_ADVERTISED_LISTENERS</span><span class="pi">:</span> <span class="s">PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092</span>
+      <span class="na">KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR</span><span class="pi">:</span> <span class="m">1</span>
+      <span class="na">KAFKA_TRANSACTION_STATE_LOG_MIN_ISR</span><span class="pi">:</span> <span class="m">1</span>
+      <span class="na">KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR</span><span class="pi">:</span> <span class="m">1</span>
+
+  <span class="na">kafka-admin</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">provectuslabs/kafka-ui</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">kafka-admin</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">9091:8080"</span>
+    <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">kafka</span>
+      <span class="pi">-</span> <span class="s">zookeeper</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">KAFKA_CLUSTERS_0_NAME=local</span>
+      <span class="pi">-</span> <span class="s">KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092</span>
+      <span class="pi">-</span> <span class="s">KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181</span>
+
+  <span class="na">db</span><span class="pi">:</span>
+    <span class="na">platform</span><span class="pi">:</span> <span class="s">linux/x86_64</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">debezium/example-postgres</span>
+    <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="na">POSTGRES_PASSWORD</span><span class="pi">:</span> <span class="s">example</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">5432:5432</span>
+    <span class="na">extra_hosts</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">host.docker.internal:host-gateway"</span>
+    <span class="na">command</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">postgres"</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">-c"</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">wal_level=logical"</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">./resource/init.sql:/docker-entrypoint-initdb.d/create-db-tables.sql</span>
+
+  <span class="na">elasticsearch</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">elasticsearch:8.8.0</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">9200:9200</span>
+      <span class="pi">-</span> <span class="s">9300:9300</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">discovery.type=single-node</span>
+      <span class="pi">-</span> <span class="s">xpack.security.enabled=false</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">ES_JAVA_OPTS=-Xms512m</span><span class="nv"> </span><span class="s">-Xmx512m"</span>
+
+  <span class="na">adminer</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">adminer</span>
+    <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">8001:8080</span>
+
+  <span class="na">kafka_connect</span><span class="pi">:</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">kafka_connect</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">debezium/connect</span>
+    <span class="na">links</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">db</span>
+      <span class="pi">-</span> <span class="s">kafka</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s1">'</span><span class="s">8083:8083'</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">BOOTSTRAP_SERVERS=kafka:29092</span>
+      <span class="pi">-</span> <span class="s">GROUP_ID=medium_debezium</span>
+      <span class="pi">-</span> <span class="s">CONFIG_STORAGE_TOPIC=my_connect_configs</span>
+      <span class="pi">-</span> <span class="s">OFFSET_STORAGE_TOPIC=my_connect_offsets</span>
+      <span class="pi">-</span> <span class="s">STATUS_STORAGE_TOPIC=my_connect_statuses</span>
+</code></pre></div></div>
+
+<h3 id="kafka-ui">Kafka UI</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://localhost:9091/ui/clusters/local/all-topics?perPage=25
+</code></pre></div></div>
+
+<h3 id="database">Database</h3>
+<ul>
+  <li>Set connection username : <code class="language-plaintext highlighter-rouge">postgres</code> and password : <code class="language-plaintext highlighter-rouge">example</code></li>
+  <li>Create a valid database <code class="language-plaintext highlighter-rouge">create database debezium_demo</code></li>
+  <li>Run query to create database</li>
+  <li>properties.yml file example
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>url: jdbc:postgresql://localhost:5432/debezium_demo
+username: postgres
+password: example
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="connector-requests">Connector Requests</h3>
+
+<p><strong>Connector information:</strong></p>
+<ul>
+  <li>Connector should be created at first. It seems like you’re working with the Debezium connector, which is used for change data capture (CDC) from database management systems like PostgreSQL. Debezium is commonly used in streaming data pipelines to capture and propagate database changes to other systems or applications in real-time.
+To configure a Debezium connector for PostgreSQL, you typically need to provide configuration parameters such as database connection details, the replication slot name, and other connector-specific settings. Below is an example configuration for setting up a Debezium connector for PostgreSQL:</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">{</span>
+    <span class="s2">"name"</span>: <span class="s2">"product-connector"</span>,
+    <span class="s2">"config"</span>: <span class="o">{</span>
+        <span class="s2">"connector.class"</span>: <span class="s2">"io.debezium.connector.postgresql.PostgresConnector"</span>,
+        <span class="s2">"tasks.max"</span>: <span class="s2">"1"</span>,
+        <span class="s2">"database.history.kafka.bootstrap.servers"</span>: <span class="s2">"kafka:9092"</span>,
+        <span class="s2">"database.hostname"</span>: <span class="s2">"db"</span>, 
+        <span class="s2">"database.port"</span>: <span class="s2">"5432"</span>,
+        <span class="s2">"database.user"</span>: <span class="s2">"postgres"</span>,
+        <span class="s2">"database.password"</span>: <span class="s2">"example"</span>,
+        <span class="s2">"database.dbname"</span>: <span class="s2">"debezium_demo"</span>,
+        <span class="s2">"database.server.name"</span>: <span class="s2">"postgres"</span>,
+        <span class="s2">"tombstones.on.delete"</span> : <span class="nb">false</span>,    
+        <span class="s2">"topic.prefix"</span> : <span class="s2">"product"</span>,
+        <span class="s2">"table.inclde.list"</span> : <span class="s2">"public.product"</span>,
+        <span class="s2">"heartbeat.interval.ms"</span> : <span class="s2">"5000"</span>,
+        <span class="s2">"key.converter"</span>: <span class="s2">"org.apache.kafka.connect.json.JsonConverter"</span>,
+        <span class="s2">"key.converter.schemas.enable"</span>: <span class="nb">false</span>,
+        <span class="s2">"value.converter"</span>: <span class="s2">"org.apache.kafka.connect.json.JsonConverter"</span>,
+        <span class="s2">"value.converter.schemas.enable"</span>: <span class="nb">false</span>,
+        <span class="s2">"plugin.name"</span> : <span class="s2">"pgoutput"</span>,
+        <span class="s2">"slot.name"</span>: <span class="s2">"unique_slot_name"</span>
+        
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">connector.class</code> : Specifies the class for the PostgreSQL connector.</li>
+  <li><code class="language-plaintext highlighter-rouge">tasks.max</code> : Defines the maximum number of tasks to create for this connector.</li>
+  <li><code class="language-plaintext highlighter-rouge">database.hostname</code>, <code class="language-plaintext highlighter-rouge">database.port</code>, <code class="language-plaintext highlighter-rouge">database.user</code>, <code class="language-plaintext highlighter-rouge">database.password</code>, <code class="language-plaintext highlighter-rouge">database.dbname</code> : Connection details for PostgreSQL.</li>
+  <li><code class="language-plaintext highlighter-rouge">database.server.name</code>: A unique identifier for the connector instance. Server’s name can be found in properties for database</li>
+  <li><code class="language-plaintext highlighter-rouge">slot.name</code> : The replication slot name used by the connector. Make sure it’s unique for each connector.</li>
+  <li><code class="language-plaintext highlighter-rouge">plugin.name</code> : Specifies the Debezium plugin to use for capturing changes.</li>
+  <li><code class="language-plaintext highlighter-rouge">schema.include</code>, table.include.list: Specify the schema and tables to include in the CDC.</li>
+  <li><code class="language-plaintext highlighter-rouge">snapshot.mode</code> : Defines how the initial snapshot of data should be taken.</li>
+  <li><code class="language-plaintext highlighter-rouge">heartbeat.interval.ms</code> : Interval for sending heartbeat messages to PostgreSQL.</li>
+  <li><code class="language-plaintext highlighter-rouge">heartbeat.action.query</code> : SQL query used for heartbeat messages.</li>
+  <li><code class="language-plaintext highlighter-rouge">snapshot.lock.timeout.ms</code> : Timeout for acquiring locks during the snapshot.</li>
+  <li><code class="language-plaintext highlighter-rouge">snapshot.select.statement.overrides</code> : Overrides the default SELECT statement used during the snapshot.</li>
+  <li><code class="language-plaintext highlighter-rouge">database.history.kafka.bootstrap.servers": "kafka:9092" </code> : Kafka broker information</li>
+  <li><code class="language-plaintext highlighter-rouge">"key.converter": "org.apache.kafka.connect.json.JsonConverter"</code> and <code class="language-plaintext highlighter-rouge">"value.converter": "org.apache.kafka.connect.json.JsonConverter"</code> : Kafka serializing configs</li>
+</ul>
+
+<h4 id="curl-requests">CURL Requests:</h4>
+
+<p>GET Connector :</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">--request</span> GET <span class="se">\</span>
+  <span class="nt">--url</span> http://localhost:8083/connectors/product-connector
+</code></pre></div></div>
+
+<p>POST - add a connector</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>localhost:8083/connectors
+</code></pre></div></div>
+
+<p>CURL Request :</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">--location</span> <span class="s1">'localhost:8083/connectors/'</span> <span class="se">\</span>
+<span class="nt">--header</span> <span class="s1">'Accept: application/json'</span> <span class="se">\</span>
+<span class="nt">--header</span> <span class="s1">'Content-Type: application/json'</span> <span class="se">\</span>
+<span class="nt">--header</span> <span class="s1">'Cookie: csrftoken=M7jtiBvQrP5MVhm9kN1nbq8hNFgi0lRS'</span> <span class="se">\</span>
+<span class="nt">--data</span> <span class="s1">'{
+    "name": "product-connector",
+    "config": {
+        "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+        "tasks.max": "1",
+        "database.history.kafka.bootstrap.servers": "kafka:9092",
+        "database.hostname": "db", 
+        "database.port": "5432",
+        "database.user": "postgres",
+        "database.password": "example",
+        "database.dbname": "debezium_demo",
+        "database.server.name": "postgres",
+        "tombstones.on.delete" : false,    
+        "topic.prefix" : "product",
+        "table.inclde.list" : "public.product",
+        "heartbeat.interval.ms" : "5000",
+        "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "key.converter.schemas.enable": false,
+        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "value.converter.schemas.enable": false,
+        "plugin.name" : "pgoutput",
+        "slot.name": "unique_slot_name"
+        
+    }
+}'</span>
+</code></pre></div></div>
+
+<p>DELETE Connector</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl --request DELETE \
+  --url http://localhost:8083/connectors/product-connector
+</code></pre></div></div>
+
+<p>Extra information for <code class="language-plaintext highlighter-rouge">slot.name</code>:</p>
+<ul>
+  <li>The error message indicates that the creation of a replication slot failed due to a slot with the name “debezium” already existing. This typically happens when attempting to set up multiple connectors for the same database host using the same replication slot name.</li>
+  <li>To resolve this issue, you need to ensure that each connector you set up for the same database host uses a distinct replication slot name. This can be achieved by configuring a unique replication slot name for each connector.</li>
+  <li>You can specify the replication slot name in the Debezium PostgreSQL connector configuration. Look for the slot.name parameter and ensure that it is set to a unique value for each connector.</li>
+</ul>
+
+<p><strong>Before null problem</strong>
+<br />
+<code class="language-plaintext highlighter-rouge">alter table product replica identity full</code> : run this command in database console</p>
+
+<h3 id="project-running-configuration">Project Running Configuration</h3>
+<ul>
+  <li>Build project</li>
+  <li>Open Docker in local machine</li>
+  <li>Run docker-compose up -d for <code class="language-plaintext highlighter-rouge">docker-compose.yml</code> file, this can be changed for other configurations</li>
+  <li>Run project</li>
+  <li>Open <code class="language-plaintext highlighter-rouge">http://localhost:9091/ui/clusters/local/all-topics?perPage=25</code> to see topics and messages on Kafka</li>
+  <li>Send CURL to create a connector, post connector</li>
+  <li>Open messages in kafka ui localhost:9091, <code class="language-plaintext highlighter-rouge">product.public.product</code> topic should be seen</li>
+  <li>Send request to create Product
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">--location</span> <span class="s1">'localhost:8080/api/v1/product/add-product'</span> <span class="se">\</span>
+<span class="nt">--header</span> <span class="s1">'Content-Type: application/json'</span> <span class="se">\</span>
+<span class="nt">--header</span> <span class="s1">'Cookie: csrftoken=M7jtiBvQrP5MVhm9kN1nbq8hNFgi0lRS'</span> <span class="se">\</span>
+<span class="nt">--data</span> <span class="s1">'{
+  "name" : "pant",
+  "price" : 150,
+  "stock" : 4
+}'</span>
+</code></pre></div>    </div>
+  </li>
+  <li>Check debezium topic [CREATE]
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"before"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"after"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pant"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Opg="</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"stock"</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.5.0.Final"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"connector"</span><span class="p">:</span><span class="w"> </span><span class="s2">"postgresql"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"product"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"ts_ms"</span><span class="p">:</span><span class="w"> </span><span class="mi">1710684511415</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"snapshot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"false"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"db"</span><span class="p">:</span><span class="w"> </span><span class="s2">"debezium_demo"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"sequence"</span><span class="p">:</span><span class="w"> </span><span class="s2">"[</span><span class="se">\"</span><span class="s2">25659272</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">25659664</span><span class="se">\"</span><span class="s2">]"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"schema"</span><span class="p">:</span><span class="w"> </span><span class="s2">"public"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"table"</span><span class="p">:</span><span class="w"> </span><span class="s2">"product"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"txId"</span><span class="p">:</span><span class="w"> </span><span class="mi">771</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"lsn"</span><span class="p">:</span><span class="w"> </span><span class="mi">25659664</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"xmin"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"op"</span><span class="p">:</span><span class="w"> </span><span class="s2">"c"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"ts_ms"</span><span class="p">:</span><span class="w"> </span><span class="mi">1710684511616</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"transaction"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>Make an update operation to product:
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">--location</span> <span class="nt">--request</span> PUT <span class="s1">'localhost:8080/api/v1/product/update-product/14'</span> <span class="se">\</span>
+<span class="nt">--header</span> <span class="s1">'Content-Type: application/json'</span> <span class="se">\</span>
+<span class="nt">--header</span> <span class="s1">'Cookie: csrftoken=M7jtiBvQrP5MVhm9kN1nbq8hNFgi0lRS'</span> <span class="se">\</span>
+<span class="nt">--data</span> <span class="s1">'{
+  "name" : "pant",
+  "price" : 1512,
+  "stock" : 6
+}'</span>
+</code></pre></div>    </div>
+  </li>
+  <li>Check messages in debezium topic: <code class="language-plaintext highlighter-rouge">product.public.product</code>
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"before"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pant"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Opg="</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"stock"</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"after"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pant"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"price"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Ak6g"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"stock"</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"source"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.5.0.Final"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"connector"</span><span class="p">:</span><span class="w"> </span><span class="s2">"postgresql"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"product"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"ts_ms"</span><span class="p">:</span><span class="w"> </span><span class="mi">1710680240132</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"snapshot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"false"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"db"</span><span class="p">:</span><span class="w"> </span><span class="s2">"debezium_demo"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"sequence"</span><span class="p">:</span><span class="w"> </span><span class="s2">"[</span><span class="se">\"</span><span class="s2">25645448</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">25645504</span><span class="se">\"</span><span class="s2">]"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"schema"</span><span class="p">:</span><span class="w"> </span><span class="s2">"public"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"table"</span><span class="p">:</span><span class="w"> </span><span class="s2">"product"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"txId"</span><span class="p">:</span><span class="w"> </span><span class="mi">760</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"lsn"</span><span class="p">:</span><span class="w"> </span><span class="mi">25645504</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"xmin"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"op"</span><span class="p">:</span><span class="w"> </span><span class="s2">"u"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"ts_ms"</span><span class="p">:</span><span class="w"> </span><span class="mi">1710680240470</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"transaction"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+</ul>
+
+  </div></div>
+
+    </section>
+    <footer class="condensed">
+      <ul class="social about-footer condensed"><a href="https://github.com/musticode" target="_blank">
+          <li>
+            <i class="icon-github-circled"></i>
+          </li>
+        </a></ul><p class="about-footer condensed">&copy;
+        2024</p><div class="about-footer condensed">
+        <p>Dark Mode
+          <i class="icon-moon"></i>
+          <label class="switch">
+            <input type="checkbox" class="dark-mode-toggle">
+            <span class="slider round" onclick="toggleDarkMode()"></span>
+          </label>
+        </p>
+      </div>
+    </footer>
+  </main>
+  
+  <script type="text/javascript" src="/assets/js/darkmode.js"></script>
+  
+  <script src="/assets/js/simple-jekyll-search.min.js"></script>
+  <script src="/assets/js/search.js"></script>
+  
+</body>
+
+</html>
