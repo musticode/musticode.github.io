@@ -1,4 +1,5 @@
 @charset "UTF-8";
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,500;1,500&display=swap");
 @font-face {
   font-family: "fontello";
   src: url("../font/fontello.eot?37382099");
@@ -562,12 +563,12 @@ pre.highlight, code {
 }
 
 body {
-  font-family: "Raleway", sans-serif;
+  font-family: "JetBrains Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
   font-size: 16px;
-  line-height: 1.2em;
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-style: normal;
+  letter-spacing: -0.3px;
 }
 
 img,
@@ -763,6 +764,8 @@ main .about .about-header .about-title {
   margin-right: 10px;
   color: #555;
   min-width: 150px;
+  font-size: 14px;
+  letter-spacing: -1px;
 }
 
 .post-meta {
@@ -816,8 +819,8 @@ main .about .about-header .about-title {
 }
 
 .post {
-  font-family: "Merriweather", sans-serif;
-  font-weight: 300;
+  font-family: "Merriweather", serif;
+  font-weight: 400;
   color: #222;
   line-height: 1.9em;
 }

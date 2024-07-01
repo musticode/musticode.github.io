@@ -1,6 +1,7 @@
 @import "ext/fonts";
 @import "ext/normalize";
 @import "syntax";
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,500;1,500&display=swap');
 
 $linkColor: #0a59b0;
 $mobileW: 768px;
@@ -15,12 +16,12 @@ $leftWidth: 220px;
 }
 
 body {
-  font-family: "Raleway", sans-serif;
+  font-family: "JetBrains Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
   font-size: 16px;
-  line-height: 1.2em;
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-style: normal;
+  letter-spacing: -0.3px;
 }
 
 img,
@@ -203,6 +204,8 @@ main {
   margin-right: 10px;
   color: #555;
   min-width: 150px;
+  font-size: 14px;
+  letter-spacing: -1px;
 }
 .post-meta {
   display: flex;
@@ -243,8 +246,8 @@ main {
   padding-left: 30px;
 }
 .post {
-  font-family: "Merriweather", sans-serif;
-  font-weight: 300;
+  font-family: "Merriweather", serif;
+  font-weight: 400;
   color: #222;
   line-height: 1.9em;
   p {
